@@ -1,9 +1,13 @@
-import sqlite3
-import requests
-import json
-import re
+import sqlite3 # for the db
+import requests # to get the data 
+import json # the api is json
+import re # regular expresion
 import datetime
 import time
+#from tkinter import Tk # to put the ip in the clipbord
+import subprocess
+import webbrowser # to open the browser
+import os 
 
 def creat_db():
     """
@@ -33,6 +37,19 @@ def creat_db():
     connection.commit()
     connection.close()
 
+def put_clipbord(txt):
+    """puts the text in windows to the clipbord
+    
+    Arguments:
+        txt {str} -- is the content youd licke to put to the clipbord
+    """
+
+    subprocess.run(['clip.exe'], input=txt.strip().encode('utf-16'), check=True)
+
+def find_ip(text):
+    regex = r'(::|(([a-fA-F0-9]{1,4}):){7}(([a-fA-F0-9]{1,4}))|(:(:([a-fA-F0-9]{1,4})){1,6})|((([a-fA-F0-9]{1,4}):){1,6}:)|((([a-fA-F0-9]{1,4}):)(:([a-fA-F0-9]{1,4})){1,6})|((([a-fA-F0-9]{1,4}):){2}(:([a-fA-F0-9]{1,4})){1,5})|((([a-fA-F0-9]{1,4}):){3}(:([a-fA-F0-9]{1,4})){1,4})|((([a-fA-F0-9]{1,4}):){4}(:([a-fA-F0-9]{1,4})){1,3})|((([a-fA-F0-9]{1,4}):){5}(:([a-fA-F0-9]{1,4})){1,2}))'
+    r = re.findall(regex, text)
+    return r[0][0]
 
 def timePassed(oldtime):
     """Checks if time is past
@@ -59,7 +76,11 @@ def get_contend():
     try:
         r =json.loads(r.text)
     except:
+        ip = find_ip(r.text)
+        put_clipbord(ip)
+        webbrowser.open_new_tab('https://pastebin.com/doc_scraping_api')
         print(r.text)
+        quit()
     
     for entry in r:
         
@@ -102,7 +123,7 @@ def get_contend():
 if __name__ == "__main__":
     creat_db()
     ran = False
-    oldtime = time.time()
+    oldtime = time.time() + 35
     while True:
         if timePassed(oldtime) or ran == False:
             oldtime = get_contend()
