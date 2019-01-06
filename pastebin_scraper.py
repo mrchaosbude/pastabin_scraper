@@ -15,7 +15,7 @@ def creat_db():
     """
     create_pastebin_db ="""
     CREATE TABLE pastabin_meta (
-    Id INTEGER PRIMARY KEY,
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
     scrape_url TEXT,
     full_url TEXT,
     date INTEGER,
@@ -25,7 +25,8 @@ def creat_db():
     title TEXT,
     syntax TEXT,
     user TEXT,
-    content TEXT);
+    content TEXT,
+    unseen INTEGER DEFAULT '1');
     """
     connection = sqlite3.connect('pastabin.db')
     cursor = connection.cursor()
@@ -47,6 +48,15 @@ def put_clipbord(txt):
     subprocess.run(['clip.exe'], input=txt.strip().encode('utf-16'), check=True)
 
 def find_ip(text):
+    """finds an ip in a given text
+    
+    Arguments:
+        text {str} -- the text to serch for an ip adress
+    
+    Returns:
+        {str} -- return ip
+    """
+
     regex = r'(::|(([a-fA-F0-9]{1,4}):){7}(([a-fA-F0-9]{1,4}))|(:(:([a-fA-F0-9]{1,4})){1,6})|((([a-fA-F0-9]{1,4}):){1,6}:)|((([a-fA-F0-9]{1,4}):)(:([a-fA-F0-9]{1,4})){1,6})|((([a-fA-F0-9]{1,4}):){2}(:([a-fA-F0-9]{1,4})){1,5})|((([a-fA-F0-9]{1,4}):){3}(:([a-fA-F0-9]{1,4})){1,4})|((([a-fA-F0-9]{1,4}):){4}(:([a-fA-F0-9]{1,4})){1,3})|((([a-fA-F0-9]{1,4}):){5}(:([a-fA-F0-9]{1,4})){1,2}))'
     r = re.findall(regex, text)
     return r[0][0]
@@ -66,7 +76,7 @@ def timePassed(oldtime):
         print('[+] 35 sec gone')
         return True
     else:
-        print('[-] wait', currenttime - oldtime)
+        print('[-] wait', int(currenttime - oldtime))
         time.sleep(1)        
         return False
     
